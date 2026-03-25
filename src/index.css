@@ -1,0 +1,134 @@
+@import "tailwindcss";
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #071120;
+  color: white;
+}
+
+@keyframes orbit-fast {
+  from {
+    transform: rotate(0deg) scale(1);
+  }
+  to {
+    transform: rotate(360deg) scale(1.04);
+  }
+}
+
+@keyframes orbit-reverse {
+  from {
+    transform: rotate(360deg) scale(0.98);
+  }
+  to {
+    transform: rotate(0deg) scale(1.03);
+  }
+}
+
+@keyframes core-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes core-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 35px rgba(139, 92, 246, 0.25);
+  }
+  50% {
+    box-shadow:
+      0 0 55px rgba(139, 92, 246, 0.45),
+      0 0 30px rgba(103, 232, 249, 0.18);
+  }
+}
+
+@keyframes inner-core {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.95;
+  }
+  50% {
+    transform: scale(1.16) rotate(8deg);
+    opacity: 1;
+  }
+}
+
+@keyframes particle-jump {
+  0%,
+  100% {
+    transform: translateY(0px) scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateY(-8px) scale(1.25);
+    opacity: 1;
+  }
+}
+
+@keyframes particle-jump-delayed {
+  0%,
+  100% {
+    transform: translateY(0px) translateX(0px) scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: translateY(-6px) translateX(3px) scale(1.2);
+    opacity: 1;
+  }
+}
+
+@keyframes particle-jump-slow {
+  0%,
+  100% {
+    transform: translateY(0px) translateX(0px) scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: translateY(-10px) translateX(-2px) scale(1.28);
+    opacity: 1;
+  }
+}
+
+.animate-orbit-fast {
+  animation: orbit-fast 2.8s linear infinite;
+}
+
+.animate-orbit-reverse {
+  animation: orbit-reverse 3.6s linear infinite;
+}
+
+.animate-core-pulse {
+  animation: core-pulse 2.2s ease-in-out infinite;
+}
+
+.animate-core-glow {
+  animation: core-glow 1.8s ease-in-out infinite;
+}
+
+.animate-inner-core {
+  animation: inner-core 1.6s ease-in-out infinite;
+}
+
+.animate-particle-jump {
+  animation: particle-jump 1.4s ease-in-out infinite;
+}
+
+.animate-particle-jump-delayed {
+  animation: particle-jump-delayed 1.8s ease-in-out infinite;
+}
+
+.animate-particle-jump-slow {
+  animation: particle-jump-slow 2.1s ease-in-out infinite;
+}
