@@ -198,10 +198,6 @@ export default function InventoryOfSelfIntroPage() {
                 )}
               </div>
             </div>
-
-            <p className="mt-4 text-xs leading-6 text-white/35">
-              Ahora esta pantalla ya revisa si existe un borrador guardado en Supabase.
-            </p>
           </div>
         </div>
       </main>

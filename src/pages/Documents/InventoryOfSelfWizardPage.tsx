@@ -214,10 +214,6 @@ export default function InventoryOfSelfWizardPage() {
                 </button>
               </div>
             </div>
-
-            <p className="mt-4 text-xs leading-6 text-white/35">
-              Tu progreso ya se guarda en Supabase cada vez que avanzas, retrocedes o sales del modulo.
-            </p>
           </div>
         </div>
       </main>
