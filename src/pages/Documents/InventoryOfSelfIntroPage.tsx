@@ -1,14 +1,25 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { idealClientManifestoFlow } from '../../features/documents/config';
+import { inventoryOfSelfFlow } from '../../features/documents/config';
 import { getLatestDraftSession } from '../../features/documents/services/documentSessions';
 
-function ProfileIcon({ className = 'h-6 w-6' }: { className?: string }) {
+function SoulIcon({ className = 'h-6 w-6' }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-      <circle cx="12" cy="8" r="3.25" stroke="currentColor" strokeWidth="1.8" />
       <path
-        d="M5.5 18C6.3 15.15 8.57 13.7 12 13.7C15.43 13.7 17.7 15.15 18.5 18"
+        d="M12 20C16.2 18.9 19 15.5 19 11.4C19 7.31 15.87 4 12 4C8.13 4 5 7.31 5 11.4C5 15.5 7.8 18.9 12 20Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9.5 10.8C10 9.9 10.85 9.4 12 9.4C13.15 9.4 14 9.9 14.5 10.8"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <path
+        d="M9.4 13.8C10.2 14.7 10.95 15.1 12 15.1C13.05 15.1 13.8 14.7 14.6 13.8"
         stroke="currentColor"
         strokeWidth="1.8"
         strokeLinecap="round"
@@ -17,19 +28,19 @@ function ProfileIcon({ className = 'h-6 w-6' }: { className?: string }) {
   );
 }
 
-const totalQuestions = idealClientManifestoFlow.steps.reduce(
+const totalQuestions = inventoryOfSelfFlow.steps.reduce(
   (acc, step) => acc + step.fields.length,
   0
 );
 
-export default function IdealClientIntroPage() {
+export default function InventoryOfSelfIntroPage() {
   const [isCheckingDraft, setIsCheckingDraft] = useState(true);
   const [hasDraft, setHasDraft] = useState(false);
 
   useEffect(() => {
     async function checkDraft() {
       try {
-        const draft = await getLatestDraftSession('ideal_client_manifesto');
+        const draft = await getLatestDraftSession('inventory_of_self');
         setHasDraft(Boolean(draft));
       } catch (error) {
         console.error(error);
@@ -51,27 +62,27 @@ export default function IdealClientIntroPage() {
       <main className="relative z-10 flex min-h-screen items-center justify-center px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
         <div className="w-full max-w-5xl">
           <div className="mx-auto max-w-3xl text-center">
-            <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-[2rem] bg-gradient-to-br from-cyan-400 via-violet-500 to-fuchsia-500 shadow-[0_0_60px_rgba(139,92,246,0.35)] sm:h-28 sm:w-28">
+            <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-[2rem] bg-gradient-to-br from-emerald-400 via-cyan-400 to-violet-500 shadow-[0_0_60px_rgba(45,212,191,0.28)] sm:h-28 sm:w-28">
               <div className="flex h-14 w-14 items-center justify-center rounded-[1.15rem] bg-white/10 text-white backdrop-blur-md sm:h-16 sm:w-16">
-                <ProfileIcon className="h-7 w-7 sm:h-8 sm:w-8" />
+                <SoulIcon className="h-7 w-7 sm:h-8 sm:w-8" />
               </div>
             </div>
 
-            <p className="mt-8 text-sm font-semibold uppercase tracking-[0.22em] text-cyan-300/90">
-              Modulo 1
+            <p className="mt-8 text-sm font-semibold uppercase tracking-[0.22em] text-emerald-300/90">
+              Modulo 2
             </p>
 
             <h1 className="mt-3 text-3xl font-bold leading-tight text-white sm:text-4xl lg:text-6xl">
-              Manifiesto de
+              Inventario del
               <span className="block bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
-                Cliente Ideal
+                Ser
               </span>
             </h1>
 
             <p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-white/65 sm:text-base lg:text-lg">
-              Vas a construir un perfil profundo, estrategico y accionable de tu
-              cliente ideal para entender como piensa, que desea, que teme, como
-              decide y que lo convence de comprar.
+              Vas a construir un mapa profundo de tu historia, tu identidad,
+              tus heridas, tus valores, tus simbolos y la version de ti que
+              estas construyendo.
             </p>
           </div>
 
@@ -82,10 +93,11 @@ export default function IdealClientIntroPage() {
                   Bloques
                 </p>
                 <p className="mt-3 text-3xl font-bold text-white">
-                  {idealClientManifestoFlow.steps.length}
+                  {inventoryOfSelfFlow.steps.length}
                 </p>
                 <p className="mt-2 text-sm leading-6 text-white/55">
-                  El cuestionario esta dividido en bloques para que sea mas facil de responder.
+                  El proceso esta dividido por capas para ayudarte a profundizar
+                  sin sentir que es una sola entrevista enorme.
                 </p>
               </div>
 
@@ -93,9 +105,12 @@ export default function IdealClientIntroPage() {
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">
                   Preguntas
                 </p>
-                <p className="mt-3 text-3xl font-bold text-white">{totalQuestions}</p>
+                <p className="mt-3 text-3xl font-bold text-white">
+                  {totalQuestions}
+                </p>
                 <p className="mt-2 text-sm leading-6 text-white/55">
-                  Cubren perfil, lenguaje, dolores, deseos, consumo y decisiones de compra.
+                  Recorren identidad, origen, familia, creencias, heridas,
+                  amor, valores, presente, futuro y cierre de integracion.
                 </p>
               </div>
 
@@ -104,10 +119,11 @@ export default function IdealClientIntroPage() {
                   Tiempo estimado
                 </p>
                 <p className="mt-3 text-3xl font-bold text-white">
-                  {idealClientManifestoFlow.estimatedMinutes} min
+                  {inventoryOfSelfFlow.estimatedMinutes} min
                 </p>
                 <p className="mt-2 text-sm leading-6 text-white/55">
-                  Puedes completarlo en una sola sesion o continuar luego.
+                  Puedes responder todo en una sola sesion o pausar y continuar
+                  despues.
                 </p>
               </div>
             </div>
@@ -119,18 +135,33 @@ export default function IdealClientIntroPage() {
 
               <div className="mt-4 grid gap-3 md:grid-cols-2">
                 <div className="rounded-2xl border border-white/8 bg-white/[0.025] p-4 text-sm leading-6 text-white/65">
-                  Perfil general, identidad profesional y contexto financiero.
+                  Identidad sin mascara, origen, infancia, familia y creencias
+                  que te han marcado.
                 </div>
                 <div className="rounded-2xl border border-white/8 bg-white/[0.025] p-4 text-sm leading-6 text-white/65">
-                  Lenguaje, palabras, codigos y manera de pensar del cliente.
+                  Gustos, simbolos, momentos epicos, fracasos, heridas y
+                  aprendizajes.
                 </div>
                 <div className="rounded-2xl border border-white/8 bg-white/[0.025] p-4 text-sm leading-6 text-white/65">
-                  Errores, bloqueos, tensiones emocionales y miedos actuales.
+                  Amor, vinculos, identidad emocional, valores, caracter y
+                  forma de habitar tu presente.
                 </div>
                 <div className="rounded-2xl border border-white/8 bg-white/[0.025] p-4 text-sm leading-6 text-white/65">
-                  Deseos, transformacion buscada, objeciones y proceso de compra.
+                  Vision de futuro, sello personal e integracion final de tu
+                  historia.
                 </div>
               </div>
+            </div>
+
+            <div className="mt-5 rounded-[1.5rem] border border-emerald-400/15 bg-emerald-400/5 p-5 sm:p-6">
+              <h3 className="text-base font-semibold text-white sm:text-lg">
+                Recomendacion antes de comenzar
+              </h3>
+              <p className="mt-3 text-sm leading-7 text-white/60">
+                Este modulo funciona mejor cuando respondes con honestidad, con
+                escenas, ejemplos y detalles. Si una pregunta te incomoda, la
+                puedes dejar en blanco o responder “aun no”.
+              </p>
             </div>
 
             <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -152,21 +183,25 @@ export default function IdealClientIntroPage() {
                   </button>
                 ) : hasDraft ? (
                   <Link
-                    to="/documents/ideal_client_manifesto/wizard"
-                    className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-violet-500 to-cyan-400 px-6 py-3 text-sm font-semibold text-white shadow-[0_0_30px_rgba(139,92,246,0.25)] transition hover:scale-[1.02]"
+                    to="/documents/inventory_of_self/wizard"
+                    className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-emerald-400 to-violet-500 px-6 py-3 text-sm font-semibold text-white shadow-[0_0_30px_rgba(16,185,129,0.22)] transition hover:scale-[1.02]"
                   >
                     Continuar borrador
                   </Link>
                 ) : (
                   <Link
-                    to="/documents/ideal_client_manifesto/wizard"
-                    className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-violet-500 to-cyan-400 px-6 py-3 text-sm font-semibold text-white shadow-[0_0_30px_rgba(139,92,246,0.25)] transition hover:scale-[1.02]"
+                    to="/documents/inventory_of_self/wizard"
+                    className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-emerald-400 to-violet-500 px-6 py-3 text-sm font-semibold text-white shadow-[0_0_30px_rgba(16,185,129,0.22)] transition hover:scale-[1.02]"
                   >
                     Comenzar modulo
                   </Link>
                 )}
               </div>
             </div>
+
+            <p className="mt-4 text-xs leading-6 text-white/35">
+              Ahora esta pantalla ya revisa si existe un borrador guardado en Supabase.
+            </p>
           </div>
         </div>
       </main>

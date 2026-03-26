@@ -2,15 +2,15 @@ import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import QuestionField from '../../features/documents/components/QuestionField';
-import { idealClientManifestoFlow } from '../../features/documents/config';
+import { inventoryOfSelfFlow } from '../../features/documents/config';
 import {
-  getOrCreateDraftSession,
-  saveDraftSession,
+    getOrCreateDraftSession,
+    saveDraftSession,
 } from '../../features/documents/services/documentSessions';
 
 type FormValues = Record<string, string>;
 
-export default function IdealClientWizardPage() {
+export default function InventoryOfSelfWizardPage() {
   const navigate = useNavigate();
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -30,7 +30,7 @@ export default function IdealClientWizardPage() {
     formState: { errors },
   } = form;
 
-  const steps = idealClientManifestoFlow.steps;
+  const steps = inventoryOfSelfFlow.steps;
   const currentStep = steps[currentStepIndex];
 
   const progress = useMemo(() => {
@@ -41,8 +41,8 @@ export default function IdealClientWizardPage() {
     async function bootstrap() {
       try {
         const draftSession = await getOrCreateDraftSession(
-          'ideal_client_manifesto',
-          idealClientManifestoFlow.title
+          'inventory_of_self',
+          inventoryOfSelfFlow.title
         );
 
         setSessionId(draftSession.id);
@@ -91,7 +91,7 @@ export default function IdealClientWizardPage() {
 
     await persistDraft(currentStepIndex);
 
-    navigate('/documents/ideal_client_manifesto/review', {
+    navigate('/documents/inventory_of_self/review', {
       state: { answers: getValues(), sessionId },
     });
   };
@@ -99,7 +99,7 @@ export default function IdealClientWizardPage() {
   const handleBack = async () => {
     if (currentStepIndex === 0) {
       await persistDraft(0);
-      navigate('/documents/ideal_client_manifesto');
+      navigate('/documents/inventory_of_self');
       return;
     }
 
@@ -111,7 +111,7 @@ export default function IdealClientWizardPage() {
 
   const handleSaveAndExit = async () => {
     await persistDraft(currentStepIndex);
-    navigate('/documents/ideal_client_manifesto');
+    navigate('/documents/inventory_of_self');
   };
 
   if (isBootstrapping) {
@@ -139,8 +139,8 @@ export default function IdealClientWizardPage() {
           <div className="mb-6 rounded-[1.75rem] border border-white/10 bg-white/[0.04] p-4 backdrop-blur-xl sm:p-5">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
-                  Cliente Ideal
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-300/80">
+                  Inventario del Ser
                 </p>
                 <h1 className="mt-2 text-2xl font-bold text-white sm:text-3xl">
                   {currentStep.title}
@@ -160,7 +160,7 @@ export default function IdealClientWizardPage() {
             <div className="mt-5">
               <div className="h-2 w-full overflow-hidden rounded-full bg-white/8">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-violet-500 to-cyan-400 transition-all duration-300"
+                  className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-violet-500 transition-all duration-300"
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -169,6 +169,11 @@ export default function IdealClientWizardPage() {
           </div>
 
           <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-4 shadow-[0_20px_80px_rgba(0,0,0,0.35)] backdrop-blur-2xl sm:p-6">
+            <div className="mb-5 rounded-[1.25rem] border border-emerald-400/10 bg-emerald-400/5 p-4 text-sm leading-7 text-white/60">
+              Responde con honestidad. Si una pregunta te incomoda, puedes dejarla
+              en blanco o responder “aun no”.
+            </div>
+
             <div className="grid gap-4">
               {currentStep.fields.map((field) => (
                 <QuestionField
@@ -203,14 +208,16 @@ export default function IdealClientWizardPage() {
                   type="button"
                   onClick={handleNext}
                   disabled={isSaving}
-                  className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-violet-500 to-cyan-400 px-6 py-3 text-sm font-semibold text-white shadow-[0_0_30px_rgba(139,92,246,0.25)] transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-emerald-400 to-violet-500 px-6 py-3 text-sm font-semibold text-white shadow-[0_0_30px_rgba(16,185,129,0.22)] transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {currentStepIndex === steps.length - 1
-                    ? 'Ir a revision'
-                    : 'Siguiente'}
+                  {currentStepIndex === steps.length - 1 ? 'Ir a revision' : 'Siguiente'}
                 </button>
               </div>
             </div>
+
+            <p className="mt-4 text-xs leading-6 text-white/35">
+              Tu progreso ya se guarda en Supabase cada vez que avanzas, retrocedes o sales del modulo.
+            </p>
           </div>
         </div>
       </main>
