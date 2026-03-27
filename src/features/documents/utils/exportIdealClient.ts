@@ -6,8 +6,6 @@ import {
   Paragraph,
   TextRun,
 } from 'docx';
-import html2canvas from 'html2canvas-pro';
-import { jsPDF } from 'jspdf';
 
 type Section = {
   title: string;
@@ -195,52 +193,4 @@ export async function exportIdealClientDocx(
 
   const blob = await Packer.toBlob(doc);
   downloadBlob(blob, `${fileName}.docx`);
-}
-
-export async function exportIdealClientPdf(
-  element: HTMLElement,
-  customTitle?: string
-) {
-  const title = customTitle ?? 'Manifiesto de Cliente Ideal';
-  const fileName = sanitizeFileName(title || 'manifiesto-cliente-ideal');
-
-  const canvas = await html2canvas(element, {
-    backgroundColor: '#071120',
-    scale: 2,
-    useCORS: true,
-    logging: false,
-  });
-
-  const imgData = canvas.toDataURL('image/png');
-
-  const pdf = new jsPDF({
-    orientation: 'portrait',
-    unit: 'pt',
-    format: 'a4',
-  });
-
-  const pageWidth = pdf.internal.pageSize.getWidth();
-  const pageHeight = pdf.internal.pageSize.getHeight();
-
-  const margin = 24;
-  const usableWidth = pageWidth - margin * 2;
-  const usableHeight = pageHeight - margin * 2;
-
-  const imgWidth = usableWidth;
-  const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-  let heightLeft = imgHeight;
-  let position = margin;
-
-  pdf.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
-  heightLeft -= usableHeight;
-
-  while (heightLeft > 0) {
-    position = heightLeft - imgHeight + margin;
-    pdf.addPage();
-    pdf.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
-    heightLeft -= usableHeight;
-  }
-
-  pdf.save(`${fileName}.pdf`);
 }

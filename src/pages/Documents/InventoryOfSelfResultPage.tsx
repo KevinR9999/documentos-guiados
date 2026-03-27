@@ -1,5 +1,7 @@
+import { PDFDownloadLink } from '@react-pdf/renderer';
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import InventoryOfSelfPdfDocument from '../../features/documents/pdf/InventoryOfSelfPdfDocument';
 import { getDocumentSessionById } from '../../features/documents/services/documentSessions';
 import { exportInventoryOfSelfDocx } from '../../features/documents/utils/exportInventoryOfSelf';
 
@@ -17,6 +19,14 @@ type GeneratedContent = {
   symbolic_elements?: string[];
   writing_seeds?: string[];
 };
+
+function sanitizeFileName(name: string) {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+}
 
 export default function InventoryOfSelfResultPage() {
   const navigate = useNavigate();
@@ -69,6 +79,10 @@ export default function InventoryOfSelfResultPage() {
       setIsExportingDocx(false);
     }
   }
+
+  const pdfFileName = `${sanitizeFileName(
+    generatedContent.title ?? 'inventario-del-ser'
+  )}.pdf`;
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#071120] text-white">
@@ -187,21 +201,25 @@ export default function InventoryOfSelfResultPage() {
 
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <button
-                    type="button"
-                    onClick={handleExportDocx}
-                    disabled={isExportingDocx}
-                    className="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/[0.05] px-5 py-3 text-sm font-medium text-white/80 transition hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-50"
+                   type="button"
+                   onClick={handleExportDocx}
+                   disabled={isExportingDocx}
+                  className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-emerald-400 to-violet-500 px-6 py-3 text-sm font-semibold text-white shadow-[0_0_30px_rgba(16,185,129,0.22)] transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    {isExportingDocx ? 'Exportando DOCX...' : 'Descargar DOCX'}
+                  {isExportingDocx ? 'Exportando DOCX...' : 'Descargar DOCX'}
                   </button>
 
-                  <button
-                    type="button"
-                    disabled
-                    className="inline-flex cursor-not-allowed items-center justify-center rounded-full bg-gradient-to-r from-emerald-400/40 to-violet-500/40 px-6 py-3 text-sm font-semibold text-white/45"
+                  <PDFDownloadLink
+                    document={
+                      <InventoryOfSelfPdfDocument data={generatedContent} />
+                    }
+                    fileName={pdfFileName}
+                    className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-emerald-400 to-violet-500 px-6 py-3 text-sm font-semibold text-white shadow-[0_0_30px_rgba(16,185,129,0.22)] transition hover:scale-[1.02]"
                   >
-                    PDF robusto despues
-                  </button>
+                    {({ loading }) =>
+                      loading ? 'Preparando PDF...' : 'Descargar PDF'
+                    }
+                  </PDFDownloadLink>
                 </div>
               </div>
             </>

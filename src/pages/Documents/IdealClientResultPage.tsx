@@ -1,10 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import IdealClientPdfDocument from '../../features/documents/pdf/IdealClientPdfDocument';
 import { getDocumentSessionById } from '../../features/documents/services/documentSessions';
-import {
-    exportIdealClientDocx,
-    exportIdealClientPdf,
-} from '../../features/documents/utils/exportIdealClient';
+import { exportIdealClientDocx } from '../../features/documents/utils/exportIdealClient';
 
 type Section = {
   title: string;
@@ -21,10 +20,17 @@ type GeneratedContent = {
   content_angle_seeds?: string[];
 };
 
+function sanitizeFileName(name: string) {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+}
+
 export default function IdealClientResultPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const documentRef = useRef<HTMLDivElement | null>(null);
 
   const sessionId = searchParams.get('sessionId');
 
@@ -32,7 +38,6 @@ export default function IdealClientResultPage() {
   const [errorMessage, setErrorMessage] = useState('');
   const [generatedContent, setGeneratedContent] = useState<GeneratedContent>({});
   const [isExportingDocx, setIsExportingDocx] = useState(false);
-  const [isExportingPdf, setIsExportingPdf] = useState(false);
 
   useEffect(() => {
     async function loadDocument() {
@@ -75,25 +80,9 @@ export default function IdealClientResultPage() {
     }
   }
 
-  async function handleExportPdf() {
-    if (!documentRef.current) {
-      alert('No se encontro el contenido del documento para exportar.');
-      return;
-    }
-
-    try {
-      setIsExportingPdf(true);
-      await exportIdealClientPdf(
-        documentRef.current,
-        generatedContent.title ?? 'Manifiesto de Cliente Ideal'
-      );
-    } catch (error) {
-      console.error(error);
-      alert('No se pudo exportar el archivo PDF.');
-    } finally {
-      setIsExportingPdf(false);
-    }
-  }
+  const pdfFileName = `${sanitizeFileName(
+    generatedContent.title ?? 'manifiesto-de-cliente-ideal'
+  )}.pdf`;
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#071120] text-white">
@@ -123,24 +112,21 @@ export default function IdealClientResultPage() {
             </div>
           ) : (
             <>
-              <div
-                ref={documentRef}
-                className="space-y-4 rounded-[2rem] border border-white/10 bg-white/[0.03] p-4 backdrop-blur-xl sm:p-6"
-              >
-                <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl sm:p-6">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
-                    Documento generado
+              <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl sm:p-6">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+                  Documento generado
+                </p>
+                <h1 className="mt-2 text-2xl font-bold text-white sm:text-3xl">
+                  {generatedContent.title ?? 'Manifiesto de Cliente Ideal'}
+                </h1>
+                {generatedContent.executive_summary ? (
+                  <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-white/65 sm:text-base">
+                    {generatedContent.executive_summary}
                   </p>
-                  <h1 className="mt-2 text-2xl font-bold text-white sm:text-3xl">
-                    {generatedContent.title ?? 'Manifiesto de Cliente Ideal'}
-                  </h1>
-                  {generatedContent.executive_summary ? (
-                    <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-white/65 sm:text-base">
-                      {generatedContent.executive_summary}
-                    </p>
-                  ) : null}
-                </div>
+                ) : null}
+              </div>
 
+              <div className="mt-6 space-y-4">
                 {(generatedContent.sections ?? []).map((section) => (
                   <div
                     key={section.title}
@@ -217,20 +203,21 @@ export default function IdealClientResultPage() {
                   <button
                     type="button"
                     onClick={handleExportDocx}
-                    disabled={isExportingDocx || isExportingPdf}
-                    className="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/[0.05] px-5 py-3 text-sm font-medium text-white/80 transition hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-50"
+                    disabled={isExportingDocx}
+                    className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-violet-500 to-cyan-400 px-6 py-3 text-sm font-semibold text-white shadow-[0_0_30px_rgba(139,92,246,0.25)] transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {isExportingDocx ? 'Exportando DOCX...' : 'Descargar DOCX'}
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={handleExportPdf}
-                    disabled={isExportingPdf || isExportingDocx}
-                    className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-violet-500 to-cyan-400 px-6 py-3 text-sm font-semibold text-white shadow-[0_0_30px_rgba(139,92,246,0.25)] transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
+                  <PDFDownloadLink
+                    document={<IdealClientPdfDocument data={generatedContent} />}
+                    fileName={pdfFileName}
+                    className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-violet-500 to-cyan-400 px-6 py-3 text-sm font-semibold text-white shadow-[0_0_30px_rgba(139,92,246,0.25)] transition hover:scale-[1.02]"
                   >
-                    {isExportingPdf ? 'Exportando PDF...' : 'Descargar PDF'}
-                  </button>
+                    {({ loading }) =>
+                      loading ? 'Preparando PDF...' : 'Descargar PDF'
+                    }
+                  </PDFDownloadLink>
                 </div>
               </div>
             </>
