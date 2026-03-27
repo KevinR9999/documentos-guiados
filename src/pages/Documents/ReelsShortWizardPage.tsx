@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import QuestionField from '../../features/documents/components/QuestionField';
 import { reelsScriptsModes } from '../../features/documents/config';
 import {
-    getOrCreateDraftSession,
-    saveDraftSession,
+  getOrCreateDraftSession,
+  saveDraftSession,
 } from '../../features/documents/services/documentSessions';
 
 type FormValues = Record<string, string>;
@@ -208,13 +208,13 @@ export default function ReelsShortWizardPage() {
 
               <div className="flex flex-col gap-3 sm:flex-row">
                 <button
-                  type="button"
-                  onClick={handleNext}
-                  disabled={isSaving}
-                  className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-amber-400 to-violet-500 px-6 py-3 text-sm font-semibold text-white shadow-[0_0_30px_rgba(251,146,60,0.22)] transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {isSaving ? 'Guardando...' : 'Guardar y salir'}
-                </button>
+  type="button"
+  onClick={handleSaveAndExit}
+  disabled={isSaving}
+  className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-amber-400 to-violet-500 px-6 py-3 text-sm font-semibold text-white shadow-[0_0_30px_rgba(251,146,60,0.22)] transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
+>
+  {isSaving ? 'Guardando...' : 'Guardar y salir'}
+</button>
 
                 <button
                   type="button"
