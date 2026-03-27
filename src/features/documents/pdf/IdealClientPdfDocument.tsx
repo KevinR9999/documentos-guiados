@@ -1,9 +1,10 @@
 import {
-    Document,
-    Page,
-    StyleSheet,
-    Text,
-    View,
+  Document,
+  Font,
+  Page,
+  StyleSheet,
+  Text,
+  View,
 } from '@react-pdf/renderer';
 
 type Section = {
@@ -18,13 +19,16 @@ export type IdealClientPdfData = {
   key_insights?: string[];
   messaging_recommendations?: string[];
   exact_language_phrases?: string[];
+  sales_triggers?: string[];
   content_angle_seeds?: string[];
 };
+
+Font.registerHyphenationCallback((word) => [word]);
 
 const styles = StyleSheet.create({
   page: {
     paddingTop: 52,
-    paddingBottom: 52,
+    paddingBottom: 42,
     paddingHorizontal: 54,
     backgroundColor: '#FFFFFF',
     color: '#111827',
@@ -61,7 +65,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Times-Roman',
     color: '#374151',
     lineHeight: 1.7,
-    textAlign: 'justify',
   },
 
   section: {
@@ -87,7 +90,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Times-Roman',
     color: '#374151',
     lineHeight: 1.75,
-    textAlign: 'justify',
     marginBottom: 7,
   },
 
@@ -113,21 +115,69 @@ const styles = StyleSheet.create({
   },
 
   footer: {
-    position: 'absolute',
-    bottom: 18,
-    left: 54,
-    right: 54,
-    textAlign: 'center',
+    marginTop: 20,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
     fontSize: 9,
     fontFamily: 'Helvetica',
     color: '#9CA3AF',
+    textAlign: 'center',
   },
 });
 
-function renderParagraphs(text?: string) {
-  if (!text) return null;
+function insertBreaksInLongTokens(text: string, maxChunk = 24) {
+  return text.replace(/\S{30,}/g, (token) => {
+    const parts: string[] = [];
+    for (let i = 0; i < token.length; i += maxChunk) {
+      parts.push(token.slice(i, i + maxChunk));
+    }
+    return parts.join('\u200B');
+  });
+}
 
-  return text
+function sanitizePdfText(input?: string) {
+  if (!input) return '';
+
+  const cleaned = input
+    .replace(/\r\n/g, '\n')
+    .replace(/\t/g, ' ')
+    .replace(/\u00A0/g, ' ')
+    .replace(/[ ]{2,}/g, ' ')
+    .split('\n')
+    .map((line) => line.trim())
+    .join('\n')
+    .trim();
+
+  return insertBreaksInLongTokens(cleaned);
+}
+
+function isNonEmpty(text?: string) {
+  return sanitizePdfText(text).length > 0;
+}
+
+function sanitizeList(items?: string[]) {
+  if (!items?.length) return [];
+  return items
+    .map((item) => sanitizePdfText(item))
+    .filter((item) => item.length > 0);
+}
+
+function sanitizeSections(sections?: Section[]) {
+  if (!sections?.length) return [];
+  return sections
+    .map((section) => ({
+      title: sanitizePdfText(section.title),
+      content: sanitizePdfText(section.content),
+    }))
+    .filter((section) => section.title.length > 0 && section.content.length > 0);
+}
+
+function renderParagraphs(text?: string) {
+  const safeText = sanitizePdfText(text);
+  if (!safeText) return null;
+
+  return safeText
     .split(/\n{2,}/)
     .map((part) => part.trim())
     .filter(Boolean)
@@ -139,16 +189,14 @@ function renderParagraphs(text?: string) {
 }
 
 function renderBulletList(items?: string[]) {
-  if (!items?.length) return null;
+  const safeItems = sanitizeList(items);
+  if (!safeItems.length) return null;
 
-  return items
-    .map((item) => item.trim())
-    .filter(Boolean)
-    .map((item, index) => (
-      <Text key={index} style={styles.listItem}>
-        • {item}
-      </Text>
-    ));
+  return safeItems.map((item, index) => (
+    <Text key={index} style={styles.listItem}>
+      • {item}
+    </Text>
+  ));
 }
 
 export default function IdealClientPdfDocument({
@@ -156,28 +204,36 @@ export default function IdealClientPdfDocument({
 }: {
   data: IdealClientPdfData;
 }) {
+  const safeTitle =
+    sanitizePdfText(data.title) || 'Manifiesto de Cliente Ideal';
+  const safeSummary = sanitizePdfText(data.executive_summary);
+  const safeSections = sanitizeSections(data.sections);
+  const safeInsights = sanitizeList(data.key_insights);
+  const safeMessaging = sanitizeList(data.messaging_recommendations);
+  const safeLanguage = sanitizeList(data.exact_language_phrases);
+  const safeSalesTriggers = sanitizeList(data.sales_triggers);
+  const safeAngles = sanitizeList(data.content_angle_seeds);
+
   return (
     <Document
-      title={data.title ?? 'Manifiesto de Cliente Ideal'}
+      title={safeTitle}
       author="Guionista de Astucia"
       subject="Manifiesto de Cliente Ideal"
       creator="Guionista de Astucia"
       producer="Guionista de Astucia"
       language="es-CO"
     >
-      <Page size="A4" style={styles.page}>
+      <Page size="A4" style={styles.page} wrap>
         <View style={styles.header} wrap={false}>
           <Text style={styles.eyebrow}>Documento generado</Text>
-          <Text style={styles.title}>
-            {data.title ?? 'Manifiesto de Cliente Ideal'}
-          </Text>
+          <Text style={styles.title}>{safeTitle}</Text>
 
-          {data.executive_summary ? (
-            <Text style={styles.summary}>{data.executive_summary}</Text>
+          {isNonEmpty(safeSummary) ? (
+            <Text style={styles.summary}>{safeSummary}</Text>
           ) : null}
         </View>
 
-        {(data.sections ?? []).map((section, index) => (
+        {safeSections.map((section, index) => (
           <View key={`${section.title}-${index}`} style={styles.section}>
             <Text style={styles.sectionTitle}>{section.title}</Text>
             <View style={styles.sectionDivider} />
@@ -185,41 +241,44 @@ export default function IdealClientPdfDocument({
           </View>
         ))}
 
-        {(data.key_insights ?? []).length > 0 ? (
+        {safeInsights.length > 0 ? (
           <View style={styles.listBlock}>
             <Text style={styles.listTitle}>Insights clave</Text>
-            <View>{renderBulletList(data.key_insights)}</View>
+            <View>{renderBulletList(safeInsights)}</View>
           </View>
         ) : null}
 
-        {(data.messaging_recommendations ?? []).length > 0 ? (
+        {safeMessaging.length > 0 ? (
           <View style={styles.listBlock}>
             <Text style={styles.listTitle}>Recomendaciones de mensaje</Text>
-            <View>{renderBulletList(data.messaging_recommendations)}</View>
+            <View>{renderBulletList(safeMessaging)}</View>
           </View>
         ) : null}
 
-        {(data.exact_language_phrases ?? []).length > 0 ? (
+        {safeLanguage.length > 0 ? (
           <View style={styles.listBlock}>
-            <Text style={styles.listTitle}>Lenguaje literal del cliente</Text>
-            <View>{renderBulletList(data.exact_language_phrases)}</View>
+            <Text style={styles.listTitle}>Lenguaje literal del avatar</Text>
+            <View>{renderBulletList(safeLanguage)}</View>
           </View>
         ) : null}
 
-        {(data.content_angle_seeds ?? []).length > 0 ? (
+        {safeSalesTriggers.length > 0 ? (
           <View style={styles.listBlock}>
-            <Text style={styles.listTitle}>Semillas de angulo para contenido</Text>
-            <View>{renderBulletList(data.content_angle_seeds)}</View>
+            <Text style={styles.listTitle}>Disparadores de compra</Text>
+            <View>{renderBulletList(safeSalesTriggers)}</View>
           </View>
         ) : null}
 
-        <Text
-          style={styles.footer}
-          render={({ pageNumber, totalPages }) =>
-            `Manifiesto de Cliente Ideal • Pagina ${pageNumber} de ${totalPages}`
-          }
-          fixed
-        />
+        {safeAngles.length > 0 ? (
+          <View style={styles.listBlock}>
+            <Text style={styles.listTitle}>Semillas de contenido</Text>
+            <View>{renderBulletList(safeAngles)}</View>
+          </View>
+        ) : null}
+
+        <Text style={styles.footer}>
+          Manifiesto de Cliente Ideal
+        </Text>
       </Page>
     </Document>
   );

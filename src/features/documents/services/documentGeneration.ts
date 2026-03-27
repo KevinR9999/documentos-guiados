@@ -52,3 +52,55 @@ export async function generateInventoryOfSelfDocument(sessionId: string) {
 
   return data;
 }
+
+export async function generateReelsShortDocument(sessionId: string) {
+  const session = await ensureAnonymousSession();
+
+  const accessToken = session.access_token;
+
+  if (!accessToken) {
+    throw new Error('No se encontro el access token del usuario actual.');
+  }
+
+  const { data, error } = await supabase.functions.invoke(
+    'generate-reels-short',
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: { sessionId },
+    }
+  );
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
+export async function generateReelsAdvancedDocument(sessionId: string) {
+  const session = await ensureAnonymousSession();
+
+  const accessToken = session.access_token;
+
+  if (!accessToken) {
+    throw new Error('No se encontro el access token del usuario actual.');
+  }
+
+  const { data, error } = await supabase.functions.invoke(
+    'generate-reels-advanced',
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: { sessionId },
+    }
+  );
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
