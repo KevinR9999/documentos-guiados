@@ -16,86 +16,108 @@ import ReelsScriptsIntroPage from './pages/Documents/ReelsScriptsIntroPage';
 import ReelsShortResultPage from './pages/Documents/ReelsShortResultPage';
 import ReelsShortReviewPage from './pages/Documents/ReelsShortReviewPage';
 import ReelsShortWizardPage from './pages/Documents/ReelsShortWizardPage';
-
+import StrategicManifestoIntroPage from './pages/Documents/StrategicManifestoIntroPage';
+import StrategicManifestoResultPage from './pages/Documents/StrategicManifestoResultPage';
+import StrategicManifestoReviewPage from './pages/Documents/StrategicManifestoReviewPage';
+import StrategicManifestoWizardPage from './pages/Documents/StrategicManifestoWizardPage';
+import LoginPage from './pages/LoginPage';
+import ProtectedRoute from './routes/ProtectedRoute';
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/documents" replace />} />
-      <Route path="/documents" element={<DocumentsHomePage />} />
+  <Route path="/login" element={<LoginPage />} />
 
-      <Route
-        path="/documents/ideal_client_manifesto"
-        element={<IdealClientIntroPage />}
-      />
-      <Route
-        path="/documents/ideal_client_manifesto/wizard"
-        element={<IdealClientWizardPage />}
-      />
-      <Route
-        path="/documents/ideal_client_manifesto/review"
-        element={<IdealClientReviewPage />}
-      />
-      <Route
-        path="/documents/ideal_client_manifesto/result"
-        element={<IdealClientResultPage />}
-      />
+  <Route element={<ProtectedRoute />}>
+    <Route path="/" element={<Navigate to="/documents" replace />} />
 
-      <Route
-        path="/documents/inventory_of_self"
-        element={<InventoryOfSelfIntroPage />}
-      />
-      <Route
-        path="/documents/inventory_of_self/wizard"
-        element={<InventoryOfSelfWizardPage />}
-      />
-      <Route
-        path="/documents/inventory_of_self/review"
-        element={<InventoryOfSelfReviewPage />}
-      />
-      <Route
-        path="/documents/inventory_of_self/result"
-        element={<InventoryOfSelfResultPage />}
-      />
+    <Route path="/documents" element={<DocumentsHomePage />} />
 
-      <Route
-        path="/documents/reels_scripts"
-        element={<ReelsScriptsIntroPage />}
-      />
-      <Route
-        path="/documents/reels_scripts/short/wizard"
-        element={<ReelsShortWizardPage />}
-      />
-      <Route
-        path="/documents/reels_scripts/short/review"
-        element={<ReelsShortReviewPage />}
-      />
+    <Route
+      path="/documents/strategic_manifesto"
+      element={<StrategicManifestoIntroPage />}
+    />
+    <Route
+      path="/documents/strategic_manifesto/wizard"
+      element={<StrategicManifestoWizardPage />}
+    />
+    <Route
+      path="/documents/strategic_manifesto/review"
+      element={<StrategicManifestoReviewPage />}
+    />
+    <Route
+      path="/documents/strategic_manifesto/result"
+      element={<StrategicManifestoResultPage />}
+    />
 
-      <Route
-        path="/documents/:flowId"
-        element={<DocumentFlowPlaceholderPage />}
-      />
-    
+    <Route
+      path="/documents/ideal_client_manifesto"
+      element={<IdealClientIntroPage />}
+    />
+    <Route
+      path="/documents/ideal_client_manifesto/wizard"
+      element={<IdealClientWizardPage />}
+    />
+    <Route
+      path="/documents/ideal_client_manifesto/review"
+      element={<IdealClientReviewPage />}
+    />
+    <Route
+      path="/documents/ideal_client_manifesto/result"
+      element={<IdealClientResultPage />}
+    />
 
-      <Route
-        path="/documents/reels_scripts/short/result"
-        element={<ReelsShortResultPage />}
-      />
+    <Route
+      path="/documents/inventory_of_self"
+      element={<InventoryOfSelfIntroPage />}
+    />
+    <Route
+      path="/documents/inventory_of_self/wizard"
+      element={<InventoryOfSelfWizardPage />}
+    />
+    <Route
+      path="/documents/inventory_of_self/review"
+      element={<InventoryOfSelfReviewPage />}
+    />
+    <Route
+      path="/documents/inventory_of_self/result"
+      element={<InventoryOfSelfResultPage />}
+    />
 
-      <Route
-        path="/documents/reels_scripts/advanced/wizard"
-        element={<ReelsAdvancedWizardPage />}
-      />
+    <Route
+      path="/documents/reels_scripts"
+      element={<ReelsScriptsIntroPage />}
+    />
+    <Route
+      path="/documents/reels_scripts/short/wizard"
+      element={<ReelsShortWizardPage />}
+    />
+    <Route
+      path="/documents/reels_scripts/short/review"
+      element={<ReelsShortReviewPage />}
+    />
+    <Route
+      path="/documents/reels_scripts/short/result"
+      element={<ReelsShortResultPage />}
+    />
+    <Route
+      path="/documents/reels_scripts/advanced/wizard"
+      element={<ReelsAdvancedWizardPage />}
+    />
+    <Route
+      path="/documents/reels_scripts/advanced/review"
+      element={<ReelsAdvancedReviewPage />}
+    />
+    <Route
+      path="/documents/reels_scripts/advanced/result"
+      element={<ReelsAdvancedResultPage />}
+    />
 
-      <Route
-        path="/documents/reels_scripts/advanced/review"
-        element={<ReelsAdvancedReviewPage />}
-      />
+    <Route
+      path="/documents/:flowId"
+      element={<DocumentFlowPlaceholderPage />}
+    />
+  </Route>
+</Routes>
 
-      <Route
-        path="/documents/reels_scripts/advanced/result"
-        element={<ReelsAdvancedResultPage />}
-      />
-
-      </Routes>
   );
 }

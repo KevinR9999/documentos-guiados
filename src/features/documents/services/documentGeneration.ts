@@ -104,3 +104,29 @@ export async function generateReelsAdvancedDocument(sessionId: string) {
 
   return data;
 }
+
+export async function generateStrategicManifestoDocument(sessionId: string) {
+  const session = await ensureAnonymousSession();
+
+  const accessToken = session.access_token;
+
+  if (!accessToken) {
+    throw new Error('No se encontro el access token del usuario actual.');
+  }
+
+  const { data, error } = await supabase.functions.invoke(
+    'generate-strategic-manifesto',
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: { sessionId },
+    }
+  );
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}

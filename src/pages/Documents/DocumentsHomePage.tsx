@@ -4,34 +4,20 @@ type IconProps = {
   className?: string;
 };
 
-function AiCoreIcon({ className = 'h-10 w-10' }: IconProps) {
+function AstuciaLightningIcon({ className = 'h-10 w-10' }: IconProps) {
   return (
-    <div className={`relative ${className} animate-core-pulse`} aria-hidden="true">
-      <div className="absolute inset-[-8%] rounded-full border border-cyan-300/25 animate-orbit-fast shadow-[0_0_25px_rgba(103,232,249,0.22)]" />
-      <div className="absolute inset-[6%] rounded-full border border-fuchsia-300/20 animate-orbit-reverse shadow-[0_0_25px_rgba(244,114,182,0.18)]" />
+    <div className={`relative ${className} astucia-logo-float`} aria-hidden="true">
+      <div className="astucia-logo-glow absolute inset-[-18%] rounded-full bg-[radial-gradient(circle,_rgba(214,255,0,0.62)_0%,_rgba(152,255,0,0.28)_28%,_rgba(0,255,204,0.16)_48%,_rgba(0,0,0,0)_76%)]" />
 
-      <span className="absolute left-1/2 top-[-2%] h-3 w-3 -translate-x-1/2 rounded-full bg-cyan-300 shadow-[0_0_18px_rgba(103,232,249,1)] animate-particle-jump" />
-      <span className="absolute bottom-[8%] left-[2%] h-2.5 w-2.5 rounded-full bg-violet-300 shadow-[0_0_16px_rgba(196,181,253,1)] animate-particle-jump-delayed" />
-      <span className="absolute right-[4%] top-[18%] h-2.5 w-2.5 rounded-full bg-fuchsia-300 shadow-[0_0_16px_rgba(244,114,182,1)] animate-particle-jump-slow" />
+      <div className="relative flex h-full w-full items-center justify-center">
+        <img
+          src="/icono-rayo.png"
+          alt=""
+          className="astucia-logo-pulse relative z-10 h-full w-full object-contain"
+        />
 
-      <div className="absolute inset-[22%] rounded-[1.1rem] border border-white/12 bg-white/8 backdrop-blur-md shadow-[0_0_45px_rgba(139,92,246,0.35)] animate-core-glow">
-        <div className="relative flex h-full w-full items-center justify-center">
-          <div className="absolute inset-[18%] rounded-[0.9rem] border border-white/10 bg-gradient-to-br from-violet-500/30 via-fuchsia-400/20 to-cyan-400/30" />
-
-          <div className="relative z-10 h-8 w-8 rounded-lg border border-white/15 bg-white/10 animate-inner-core">
-            <span className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-[0_0_20px_rgba(255,255,255,1)]" />
-          </div>
-
-          <span className="absolute left-[18%] top-1/2 h-px w-[18%] -translate-y-1/2 bg-gradient-to-r from-cyan-300/0 to-cyan-300/80" />
-          <span className="absolute right-[18%] top-1/2 h-px w-[18%] -translate-y-1/2 bg-gradient-to-l from-fuchsia-300/0 to-fuchsia-300/80" />
-          <span className="absolute left-1/2 top-[18%] h-[18%] w-px -translate-x-1/2 bg-gradient-to-b from-white/0 to-white/80" />
-          <span className="absolute bottom-[18%] left-1/2 h-[18%] w-px -translate-x-1/2 bg-gradient-to-t from-white/0 to-white/80" />
-
-          <span className="absolute left-[14%] top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-cyan-300 shadow-[0_0_14px_rgba(103,232,249,1)]" />
-          <span className="absolute right-[14%] top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-fuchsia-300 shadow-[0_0_14px_rgba(244,114,182,1)]" />
-          <span className="absolute left-1/2 top-[14%] h-2 w-2 -translate-x-1/2 rounded-full bg-white shadow-[0_0_14px_rgba(255,255,255,1)]" />
-          <span className="absolute bottom-[14%] left-1/2 h-2 w-2 -translate-x-1/2 rounded-full bg-violet-300 shadow-[0_0_14px_rgba(196,181,253,1)]" />
-        </div>
+        <span className="astucia-logo-flicker absolute right-[8%] top-[10%] h-2.5 w-2.5 rounded-full bg-lime-300 shadow-[0_0_16px_rgba(210,255,0,0.8)] blur-[1px]" />
+        <span className="astucia-logo-flicker absolute left-[10%] bottom-[16%] h-2 w-2 rounded-full bg-emerald-300 shadow-[0_0_14px_rgba(52,255,182,0.65)] blur-[1px]" />
       </div>
     </div>
   );
@@ -183,22 +169,26 @@ export default function DocumentsHomePage() {
       <main className="relative z-10 flex min-h-screen items-center justify-center px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
         <div className="w-full max-w-6xl">
           <div className="mx-auto max-w-3xl text-center">
-            <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-[2rem] bg-gradient-to-br from-violet-500 via-fuchsia-500 to-cyan-400 shadow-[0_0_60px_rgba(139,92,246,0.35)] sm:h-28 sm:w-28">
-              <div className="flex h-14 w-14 items-center justify-center rounded-[1.15rem] bg-white/10 backdrop-blur-md sm:h-16 sm:w-16">
-                <AiCoreIcon className="h-9 w-9 sm:h-11 sm:w-11" />
-              </div>
-            </div>
+            <div className="mx-auto flex h-28 w-28 items-center justify-center rounded-[2rem] border border-lime-300/15 bg-[radial-gradient(circle_at_30%_30%,rgba(220,255,0,0.18),transparent_38%),radial-gradient(circle_at_75%_70%,rgba(0,255,200,0.12),transparent_42%),linear-gradient(180deg,rgba(7,17,32,0.92)_0%,rgba(4,12,22,0.98)_100%)] shadow-[0_0_60px_rgba(190,255,0,0.16)] sm:h-32 sm:w-32">
+            <div className="flex h-16 w-16 items-center justify-center rounded-[1.2rem] border border-lime-300/10 bg-white/[0.05] backdrop-blur-md sm:h-20 sm:w-20">
+      <AstuciaLightningIcon className="h-12 w-12 sm:h-14 sm:w-14" />
+  </div>
+</div>
 
             <h1 className="mt-8 text-3xl font-bold leading-tight text-white sm:text-4xl lg:text-6xl">
-              Creo y estructuro tus
-              <span className="block bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
-                documentos estrategicos
-              </span>
+              ASTUC.IA
             </h1>
 
-            <p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-white/65 sm:text-base lg:text-lg">
-              Responde preguntas guiadas y convierte tus respuestas en
-              entregables claros, profesionales y listos para descargar.
+            <p className="mx-auto mt-5 max-w-2xl text-sm leading-3 text-white/65 sm:text-base lg:text-lg">
+              Centro oficial de inteligencia artificial.
+            </p>
+
+            <p className="mx-auto mt-5 max-w-2xl text-sm leading-3 text-white/65 sm:text-base lg:text-lg">
+              Para miembros exclusivos de ASTUCIA.
+            </p>
+
+            <p className="mx-auto mt-5 max-w-2xl text-sm leading-3 text-white/65 sm:text-base lg:text-lg">
+              Creada y desarrollada por ASTUCIA LLC.
             </p>
           </div>
 

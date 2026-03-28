@@ -2,34 +2,20 @@ import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import QuestionField from '../../features/documents/components/QuestionField';
-import { reelsScriptsModes } from '../../features/documents/config';
+import { strategicManifestoFlow } from '../../features/documents/config';
 import {
-  getOrCreateDraftSession,
-  saveDraftSession,
+    getOrCreateDraftSession,
+    saveDraftSession,
 } from '../../features/documents/services/documentSessions';
 
 type FormValues = Record<string, string>;
 
-export default function ReelsAdvancedWizardPage() {
+export default function StrategicManifestoWizardPage() {
   const navigate = useNavigate();
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [isBootstrapping, setIsBootstrapping] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-
-  const advancedMode = reelsScriptsModes.find((mode) => mode.mode === 'advanced');
-
-  if (!advancedMode) {
-    return (
-      <div className="min-h-screen bg-[#071120] text-white flex items-center justify-center px-6">
-        <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-6 text-center">
-          <p className="text-sm text-white/70">
-            No se encontro la configuracion de la version avanzada de Reels.
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   const form = useForm<FormValues>({
     defaultValues: {},
@@ -44,7 +30,7 @@ export default function ReelsAdvancedWizardPage() {
     formState: { errors },
   } = form;
 
-  const steps = advancedMode.steps;
+  const steps = strategicManifestoFlow.steps;
   const currentStep = steps[currentStepIndex];
   const stepNumber = currentStepIndex + 1;
 
@@ -56,8 +42,8 @@ export default function ReelsAdvancedWizardPage() {
     async function bootstrap() {
       try {
         const draftSession = await getOrCreateDraftSession(
-          'reels_scripts_advanced',
-          'Guiones para Reels · Version avanzada'
+          'strategic_manifesto',
+          strategicManifestoFlow.title
         );
 
         setSessionId(draftSession.id);
@@ -106,19 +92,15 @@ export default function ReelsAdvancedWizardPage() {
 
     await persistDraft(currentStepIndex);
 
-    navigate('/documents/reels_scripts/advanced/review', {
-      state: {
-        answers: getValues(),
-        mode: 'advanced',
-        sessionId,
-      },
+    navigate('/documents/strategic_manifesto/review', {
+      state: { answers: getValues(), sessionId },
     });
   };
 
   const handleBack = async () => {
     if (currentStepIndex === 0) {
       await persistDraft(0);
-      navigate('/documents/reels_scripts');
+      navigate('/documents/strategic_manifesto');
       return;
     }
 
@@ -130,7 +112,7 @@ export default function ReelsAdvancedWizardPage() {
 
   const handleSaveAndExit = async () => {
     await persistDraft(currentStepIndex);
-    navigate('/documents/reels_scripts');
+    navigate('/documents/strategic_manifesto');
   };
 
   if (isBootstrapping) {
@@ -161,8 +143,8 @@ export default function ReelsAdvancedWizardPage() {
           >
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-300/80">
-                  Reels · Version avanzada
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+                  Manifiesto Estratégico
                 </p>
                 <h1 className="mt-2 text-2xl font-bold text-white sm:text-3xl">
                   {currentStep.title}
@@ -185,7 +167,7 @@ export default function ReelsAdvancedWizardPage() {
             <div key={`progress-${currentStep.id}`} className="mt-5">
               <div className="h-2 w-full overflow-hidden rounded-full bg-white/8">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-amber-400 to-violet-500 transition-all duration-300"
+                  className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-violet-500 transition-all duration-300"
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -194,9 +176,10 @@ export default function ReelsAdvancedWizardPage() {
           </div>
 
           <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-4 shadow-[0_20px_80px_rgba(0,0,0,0.35)] backdrop-blur-2xl sm:p-6">
-            <div className="mb-5 rounded-[1.25rem] border border-violet-400/10 bg-violet-400/5 p-4 text-sm leading-7 text-white/60">
-              Esta version te da mas control sobre la estrategia del reel:
-              objetivo, idea, angulo, hook, formato, objecion, prueba, CTA y tono.
+            <div className="mb-5 rounded-[1.25rem] border border-cyan-400/10 bg-cyan-400/5 p-4 text-sm leading-7 text-white/60">
+              Responde como si estuvieras construyendo el documento estratégico
+              interno más importante de tu oferta. Entre más concreto y preciso
+              seas, más fuerte quedará el manifiesto final.
             </div>
 
             <div className="grid gap-4">
@@ -225,7 +208,7 @@ export default function ReelsAdvancedWizardPage() {
                   type="button"
                   onClick={handleSaveAndExit}
                   disabled={isSaving}
-                  className="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/[0.04] px-5 py-3 text-sm font-medium text-white/70 transition hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-cyan-400 to-violet-500 px-6 py-3 text-sm font-semibold text-white shadow-[0_0_30px_rgba(56,189,248,0.22)] transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {isSaving ? 'Guardando...' : 'Guardar y salir'}
                 </button>
@@ -234,7 +217,7 @@ export default function ReelsAdvancedWizardPage() {
                   type="button"
                   onClick={handleNext}
                   disabled={isSaving}
-                  className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-amber-400 to-violet-500 px-6 py-3 text-sm font-semibold text-white shadow-[0_0_30px_rgba(251,146,60,0.22)] transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-cyan-400 to-violet-500 px-6 py-3 text-sm font-semibold text-white shadow-[0_0_30px_rgba(56,189,248,0.22)] transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {currentStepIndex === steps.length - 1 ? 'Ir a revision' : 'Siguiente'}
                 </button>
