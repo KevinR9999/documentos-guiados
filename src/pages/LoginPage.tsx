@@ -101,9 +101,6 @@ export default function LoginPage() {
                 ASTUC.IA
               </h1>
 
-              <p className="mt-3 text-sm leading-6 text-white/60 sm:text-base">
-                Acceso privado para ingresar al centro oficial de inteligencia artificial.
-              </p>
             </div>
 
             <form onSubmit={handleSubmit} className="mt-7 space-y-4">
@@ -161,10 +158,6 @@ export default function LoginPage() {
               </button>
             </form>
 
-            <p className="mt-5 text-center text-xs leading-6 text-white/35">
-              El acceso a la web requiere credenciales compartidas. Luego de ingresar,
-              cada visitante continúa con su propia sesión interna para guardar progreso.
-            </p>
           </div>
         </div>
       </main>
