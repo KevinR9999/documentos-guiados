@@ -175,9 +175,13 @@ export default function DocumentsHomePage() {
   </div>
 </div>
 
-            <h1 className="mt-8 text-3xl font-bold leading-tight text-white sm:text-4xl lg:text-6xl">
-              ASTUC.IA
-            </h1>
+          <div className="mt-8 flex justify-center">
+  <img
+    src="/logoastuciaBLANCO-03.png"
+    alt="ASTUCIA"
+    className="h-10 w-auto object-contain opacity-95 drop-shadow-[0_0_18px_rgba(255,255,255,0.08)] sm:h-12 lg:h-14"
+  />
+</div>
 
             <p className="mx-auto mt-5 max-w-2xl text-sm leading-3 text-white/65 sm:text-base lg:text-lg">
               Centro oficial de inteligencia artificial.
