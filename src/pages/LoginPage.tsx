@@ -89,7 +89,7 @@ export default function LoginPage() {
 
       <main className="relative z-10 flex min-h-screen items-center justify-center px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
         <div className="w-full max-w-md">
-          <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-5 shadow-[0_20px_80px_rgba(0,0,0,0.35)] backdrop-blur-2xl sm:p-7">
+          <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-5 shadow-[0_20px_80px_rgba(0,0,0,0.35)] backdrop-blur-2xl sm:p-13">
             <div className="text-center">
               <div className="mx-auto flex h-28 w-28 items-center justify-center rounded-[2rem] border border-lime-300/15 bg-[radial-gradient(circle_at_30%_30%,rgba(220,255,0,0.18),transparent_38%),radial-gradient(circle_at_75%_70%,rgba(0,255,200,0.12),transparent_42%),linear-gradient(180deg,rgba(7,17,32,0.92)_0%,rgba(4,12,22,0.98)_100%)] shadow-[0_0_60px_rgba(190,255,0,0.16)] sm:h-32 sm:w-32">
                 <div className="flex h-16 w-16 items-center justify-center rounded-[1.2rem] border border-lime-300/10 bg-white/[0.05] backdrop-blur-md sm:h-20 sm:w-20">
@@ -97,9 +97,15 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              <h1 className="mt-7 text-3xl font-bold text-white sm:text-4xl">
-                ASTUC.IA
-              </h1>
+<div className="mt-8 flex justify-center">
+<img
+    src="/logoastuciaBLANCO-03.png"
+    alt="ASTUCIA"
+    className="h-10 w-auto object-contain opacity-95 drop-shadow-[0_0_18px_rgba(255,255,255,0.08)] sm:h-12 lg:h-14"
+  />
+
+</div>
+            
 
             </div>
 
