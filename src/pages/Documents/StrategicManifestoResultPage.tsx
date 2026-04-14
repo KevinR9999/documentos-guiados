@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import StrategicManifestoPdfDocument from '../../features/documents/pdf/StrategicManifestoPdfDocument';
 import { getDocumentSessionById } from '../../features/documents/services/documentSessions';
 import { exportStrategicManifestoDocx } from '../../features/documents/utils/exportStrategicManifesto';
+import { supabase } from '../../lib/supabase';
 
 type Section = {
   title: string;
@@ -37,6 +38,9 @@ export default function StrategicManifestoResultPage() {
   const [errorMessage, setErrorMessage] = useState('');
   const [generatedContent, setGeneratedContent] = useState<GeneratedContent>({});
   const [isExportingDocx, setIsExportingDocx] = useState(false);
+  const [scriptId, setScriptId] = useState<string | null>(null);
+  const [isSavingFavorite, setIsSavingFavorite] = useState(false);
+  const [favoriteSaved, setFavoriteSaved] = useState(false);
 
   useEffect(() => {
     async function loadDocument() {
@@ -56,6 +60,21 @@ export default function StrategicManifestoResultPage() {
         }
 
         setGeneratedContent(session.generated_content as GeneratedContent);
+
+        const { data: savedScripts, error: scriptLookupError } = await supabase
+          .from('generated_scripts')
+          .select('id')
+          .eq('module', 'strategic_manifesto')
+          .eq('script_type', 'strategic_manifesto_document')
+          .contains('input_context', { sessionId })
+          .order('created_at', { ascending: false })
+          .limit(1);
+
+        if (scriptLookupError) {
+          console.error('No se pudo localizar el script guardado:', scriptLookupError);
+        } else if (savedScripts?.length) {
+          setScriptId(savedScripts[0].id);
+        }
       } catch (error) {
         console.error(error);
         setErrorMessage('No se pudo cargar el manifiesto generado.');
@@ -67,16 +86,91 @@ export default function StrategicManifestoResultPage() {
     loadDocument();
   }, [sessionId]);
 
+  async function trackFeedback(feedback: {
+    is_favorite?: boolean;
+    exported_pdf?: boolean;
+    exported_docx?: boolean;
+    reused?: boolean;
+    rating?: number;
+  }) {
+    try {
+      if (!scriptId) {
+        console.warn('No hay scriptId disponible para guardar feedback.');
+        return;
+      }
+
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError || !user) {
+        console.error('No se pudo obtener el usuario actual para guardar feedback:', userError);
+        return;
+      }
+
+      const { error: feedbackError } = await supabase.from('script_feedback').insert({
+        script_id: scriptId,
+        user_id: user.id,
+        rating: feedback.rating ?? null,
+        is_favorite: feedback.is_favorite ?? false,
+        exported_pdf: feedback.exported_pdf ?? false,
+        exported_docx: feedback.exported_docx ?? false,
+        reused: feedback.reused ?? false,
+      });
+
+      if (feedbackError) {
+        console.error('No se pudo guardar el feedback del documento:', feedbackError);
+        return;
+      }
+
+      const { error: promoteError } = await supabase.functions.invoke(
+        'promote-script-to-global',
+        {
+          body: { scriptId },
+        }
+      );
+
+      if (promoteError) {
+        console.error('No se pudo reprocesar el documento para aprendizaje global:', promoteError);
+      }
+    } catch (error) {
+      console.error('Error inesperado guardando feedback:', error);
+    }
+  }
+
+  async function handleFavorite() {
+    if (!scriptId || favoriteSaved) {
+      return;
+    }
+
+    try {
+      setIsSavingFavorite(true);
+      await trackFeedback({ is_favorite: true, rating: 5 });
+      setFavoriteSaved(true);
+    } catch (error) {
+      console.error(error);
+      alert('No se pudo marcar el documento como favorito.');
+    } finally {
+      setIsSavingFavorite(false);
+    }
+  }
+
   async function handleExportDocx() {
     try {
       setIsExportingDocx(true);
       await exportStrategicManifestoDocx(generatedContent);
+      await trackFeedback({ exported_docx: true });
     } catch (error) {
       console.error(error);
       alert('No se pudo exportar el archivo DOCX.');
     } finally {
       setIsExportingDocx(false);
     }
+  }
+
+  async function handlePdfDownload() {
+    await trackFeedback({ exported_pdf: true });
   }
 
   const pdfFileName = `${sanitizeFileName(
@@ -188,6 +282,19 @@ export default function StrategicManifestoResultPage() {
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <button
                     type="button"
+                    onClick={handleFavorite}
+                    disabled={isSavingFavorite || favoriteSaved || !scriptId}
+                    className="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/[0.04] px-6 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {favoriteSaved
+                      ? 'Guardado como favorito'
+                      : isSavingFavorite
+                        ? 'Guardando favorito...'
+                        : 'Marcar favorito'}
+                  </button>
+
+                  <button
+                    type="button"
                     onClick={handleExportDocx}
                     disabled={isExportingDocx}
                     className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-cyan-400 to-violet-500 px-6 py-3 text-sm font-semibold text-white shadow-[0_0_30px_rgba(56,189,248,0.22)] transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
@@ -198,6 +305,7 @@ export default function StrategicManifestoResultPage() {
                   <PDFDownloadLink
                     document={<StrategicManifestoPdfDocument data={generatedContent} />}
                     fileName={pdfFileName}
+                    onClick={handlePdfDownload}
                     className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-cyan-400 to-violet-500 px-6 py-3 text-sm font-semibold text-white shadow-[0_0_30px_rgba(56,189,248,0.22)] transition hover:scale-[1.02]"
                   >
                     {({ loading }) =>
