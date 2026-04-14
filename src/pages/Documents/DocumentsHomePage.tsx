@@ -1,4 +1,7 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { clearSharedAccess } from '../../features/auth/sharedAccess';
+import { supabase } from '../../lib/supabase';
 
 type IconProps = {
   className?: string;
@@ -159,6 +162,36 @@ const flows = [
 ];
 
 export default function DocumentsHomePage() {
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const [welcomeName, setWelcomeName] = useState('usuario');
+
+  const handleLogout = async () => {
+    clearSharedAccess();
+
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error('Error al cerrar sesión:', error.message);
+      alert('No se pudo cerrar sesión');
+      return;
+    }
+
+    window.location.replace('/login');
+  };
+
+  useEffect(() => {
+    const shouldShow = sessionStorage.getItem('astucia_show_welcome');
+    const savedName = sessionStorage.getItem('astucia_welcome_name');
+
+    if (shouldShow === 'true') {
+      setWelcomeName(savedName || 'usuario');
+      setShowWelcomeModal(true);
+
+      sessionStorage.removeItem('astucia_show_welcome');
+      sessionStorage.removeItem('astucia_welcome_name');
+    }
+  }, []);
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#071120] text-white">
       <div className="absolute inset-0">
@@ -166,22 +199,66 @@ export default function DocumentsHomePage() {
         <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:32px_32px]" />
       </div>
 
+      {showWelcomeModal ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 px-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(10,20,35,0.96)_0%,rgba(7,17,32,0.98)_100%)] p-6 text-center shadow-[0_20px_80px_rgba(0,0,0,0.45)] backdrop-blur-2xl">
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-[1.5rem] border border-lime-300/15 bg-[radial-gradient(circle_at_30%_30%,rgba(220,255,0,0.18),transparent_38%),radial-gradient(circle_at_75%_70%,rgba(0,255,200,0.12),transparent_42%),linear-gradient(180deg,rgba(7,17,32,0.92)_0%,rgba(4,12,22,0.98)_100%)] shadow-[0_0_40px_rgba(190,255,0,0.16)]">
+              <AstuciaLightningIcon className="h-10 w-10" />
+            </div>
+
+            <h2 className="mt-5 text-2xl font-semibold text-white">
+              Hola, {welcomeName}
+            </h2>
+
+            <p className="mt-3 text-sm leading-6 text-white/70 sm:text-base">
+              Bienvenido a ASTUCIA.IA
+            </p>
+
+            <p className="mt-2 text-sm leading-6 text-white/60 sm:text-base">
+              Nos alegra tenerte aquí. Esperamos que esta experiencia te ayude a crear
+              documentos claros, poderosos y alineados con tu visión.
+            </p>
+
+            <p className="mt-2 text-sm leading-6 text-white/60 sm:text-base">
+              Te deseamos una sesión productiva, inspiradora y llena de grandes ideas.
+            </p>
+
+            <button
+              onClick={() => setShowWelcomeModal(false)}
+              className="mt-6 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-cyan-400 to-violet-500 px-6 py-3 text-sm font-semibold text-white shadow-[0_0_30px_rgba(56,189,248,0.22)] transition hover:scale-[1.02]"
+            >
+              Continuar
+            </button>
+          </div>
+        </div>
+      ) : null}
+
       <main className="relative z-10 flex min-h-screen items-center justify-center px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
         <div className="w-full max-w-6xl">
+          <div className="mb-6 flex justify-end">
+            <button
+              onClick={handleLogout}
+              className="group inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm font-medium text-white/85 shadow-[0_12px_30px_rgba(0,0,0,0.22)] backdrop-blur-xl transition duration-300 hover:-translate-y-0.5 hover:border-cyan-300/30 hover:bg-white/[0.08] hover:text-white hover:shadow-[0_0_30px_rgba(56,189,248,0.14)]"
+            >
+              <span className="h-2 w-2 rounded-full bg-cyan-300 shadow-[0_0_12px_rgba(103,232,249,0.9)] transition group-hover:bg-violet-300 group-hover:shadow-[0_0_14px_rgba(196,181,253,0.95)]" />
+              <span>Cerrar sesión</span>
+            </button>
+          </div>
+
           <div className="mx-auto max-w-3xl text-center">
             <div className="mx-auto flex h-28 w-28 items-center justify-center rounded-[2rem] border border-lime-300/15 bg-[radial-gradient(circle_at_30%_30%,rgba(220,255,0,0.18),transparent_38%),radial-gradient(circle_at_75%_70%,rgba(0,255,200,0.12),transparent_42%),linear-gradient(180deg,rgba(7,17,32,0.92)_0%,rgba(4,12,22,0.98)_100%)] shadow-[0_0_60px_rgba(190,255,0,0.16)] sm:h-32 sm:w-32">
-            <div className="flex h-16 w-16 items-center justify-center rounded-[1.2rem] border border-lime-300/10 bg-white/[0.05] backdrop-blur-md sm:h-20 sm:w-20">
-      <AstuciaLightningIcon className="h-12 w-12 sm:h-14 sm:w-14" />
-  </div>
-</div>
+              <div className="flex h-16 w-16 items-center justify-center rounded-[1.2rem] border border-lime-300/10 bg-white/[0.05] backdrop-blur-md sm:h-20 sm:w-20">
+                <AstuciaLightningIcon className="h-12 w-12 sm:h-14 sm:w-14" />
+              </div>
+            </div>
 
-          <div className="mt-8 flex justify-center">
-  <img
-    src="/logoastuciaBLANCO-03.png"
-    alt="ASTUCIA"
-    className="h-10 w-auto object-contain opacity-95 drop-shadow-[0_0_18px_rgba(255,255,255,0.08)] sm:h-12 lg:h-14"
-  />
-</div>
+            <div className="mt-8 flex justify-center">
+              <img
+                src="/logoastuciaBLANCO-03.png"
+                alt="ASTUCIA"
+                className="h-10 w-auto object-contain opacity-95 drop-shadow-[0_0_18px_rgba(255,255,255,0.08)] sm:h-12 lg:h-14"
+              />
+            </div>
 
             <p className="mx-auto mt-5 max-w-2xl text-sm leading-3 text-white/65 sm:text-base lg:text-lg">
               Centro oficial de inteligencia artificial.

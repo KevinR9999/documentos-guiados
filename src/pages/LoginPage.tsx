@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ensureAnonymousSession } from '../features/auth/ensureAnonymousSession';
-import { hasValidSharedAccess, saveSharedAccess } from '../features/auth/sharedAccess';
 import AstuciaLightningIcon from '../features/documents/components/AstuciaLightningIcon';
 import { supabase } from '../lib/supabase';
 
@@ -18,9 +16,11 @@ export default function LoginPage() {
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    if (hasValidSharedAccess()) {
-      navigate('/documents', { replace: true });
-    }
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) {
+        navigate('/documents', { replace: true });
+      }
+    });
   }, [navigate]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -29,52 +29,34 @@ export default function LoginPage() {
     setErrorMessage('');
 
     if (!username.trim() || !password.trim()) {
-      setErrorMessage('Debes ingresar usuario y contraseña.');
+      setErrorMessage('Debes ingresar correo y contraseña.');
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke(
-        'verify-shared-access',
-        {
-          body: {
-            username: username.trim(),
-            password,
-          },
-        }
-      );
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: username.trim(),
+        password,
+      });
 
       if (error) {
         throw error;
       }
 
-      if (!data?.success) {
-        throw new Error('No se pudo validar el acceso.');
-      }
+      const displayName =
+        data.user?.user_metadata?.full_name ||
+        data.user?.email?.split('@')[0] ||
+        'usuario';
 
-      saveSharedAccess({
-        username: data.username,
-        expiresAt: data.expiresAt,
-      });
-
-      await ensureAnonymousSession();
+      sessionStorage.setItem('astucia_show_welcome', 'true');
+      sessionStorage.setItem('astucia_welcome_name', displayName);
 
       navigate(from, { replace: true });
     } catch (error: any) {
-      console.error('Error en login compartido:', error);
-
-      if (error?.context) {
-        try {
-          const details = await error.context.json();
-          console.error('Detalles de la función:', details);
-        } catch {
-          // ignore
-        }
-      }
-
-      setErrorMessage('Usuario o contraseña incorrectos.');
+      console.error('Error en login:', error);
+      setErrorMessage('Correo o contraseña incorrectos.');
     } finally {
       setIsSubmitting(false);
     }
@@ -97,30 +79,27 @@ export default function LoginPage() {
                 </div>
               </div>
 
-<div className="mt-8 flex justify-center">
-<img
-    src="/logoastuciaBLANCO-03.png"
-    alt="ASTUCIA"
-    className="h-10 w-auto object-contain opacity-95 drop-shadow-[0_0_18px_rgba(255,255,255,0.08)] sm:h-12 lg:h-14"
-  />
-
-</div>
-            
-
+              <div className="mt-8 flex justify-center">
+                <img
+                  src="/logoastuciaBLANCO-03.png"
+                  alt="ASTUCIA"
+                  className="h-10 w-auto object-contain opacity-95 drop-shadow-[0_0_18px_rgba(255,255,255,0.08)] sm:h-12 lg:h-14"
+                />
+              </div>
             </div>
 
             <form onSubmit={handleSubmit} className="mt-7 space-y-4">
               <div>
                 <label className="mb-2 block text-sm font-medium text-white/80">
-                  Usuario
+                  Correo electrónico
                 </label>
                 <input
-                  type="text"
+                  type="email"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  autoComplete="username"
+                  autoComplete="email"
                   className="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/25 focus:border-cyan-300/40 focus:bg-white/[0.06]"
-                  placeholder="Ingresa tu usuario"
+                  placeholder="Ingresa tu correo electrónico"
                 />
               </div>
 
@@ -163,7 +142,6 @@ export default function LoginPage() {
                 {isSubmitting ? 'Ingresando...' : 'Ingresar'}
               </button>
             </form>
-
           </div>
         </div>
       </main>
